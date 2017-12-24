@@ -18,6 +18,8 @@ EDA done in [this notebook](). Some highlighted findings:
 
 ### Intensity shapes
 
+### Word representations across categories
+
 ### Classifying story categories
 
 ### Building language models
