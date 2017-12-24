@@ -7,7 +7,7 @@ Use `scripts/get_literotica_urls.py` and `scripts/download_literotica_data.py` t
 
 ```
 # Saves urls and some metadata for each story to tsv file
-python get_literotica_urls.py urls.tsv
+python get_literotica_urls.py --urls urls.tsv
 
 # Downloads stories or subset of stories
 python download_literotica_data.py --urls urls.tsv --data_dir data/literotica/ --sample 0.2
