@@ -2,8 +2,9 @@
 Save literotica urls to file so that these can be downloaded.
 """
 
-import sys
+import os
 import requests
+import argparse
 from bs4 import BeautifulSoup
 
 def get_soup(url):
@@ -24,20 +25,27 @@ def is_story_url(url):
 def is_category_page_url(url):
   return url.endswith('-page')
 
-try:
-  filename = sys.argv[1]
-except IndexError:
-  print('Command: python get_literotica_urls.py <urls_path>')
-  sys.exit(1)
+parser = argparse.ArgumentParser()
+parser.add_argument('--urls', required=True, type=str, help='path to save urls (ex: urls.tsv)')
+parser.add_argument('--category', type=str, help='start with this category (ex: mind-control)', default=None)
 
-fp = open(filename, 'w')
-fp.write('story_url\tnum_pages\tcategory\tauthor\tnum_comments\tnum_views\tnum_favorites\n')
+args = parser.parse_args()
+
+if os.path.isfile(args.urls):
+  fp = open(args.urls, 'a')
+else:
+  fp = open(args.urls, 'w')
+  fp.write('story_url\tnum_pages\tcategory\tauthor\tnum_comments\tnum_views\tnum_favorites\n')
 
 base_url = 'https://www.literotica.com/stories/'
 category_urls = filter_urls(base_url, is_category_url)
+categories = [url.split('/')[-1] for url in category_urls]
 
-for category_url in category_urls:
-  category = category_url.split('/')[-1]
+start_index = 0 if args.category is None else categories.index(args.category)
+
+print('Starting with category:', args.category, start_index)
+
+for category, category_url in list(zip(categories, category_urls))[start_index:]:
   print('category:', category)
   story_urls = filter_urls(category_url, is_story_url)
   page_urls = filter_urls(category_url, is_category_page_url)
@@ -50,13 +58,20 @@ for category_url in category_urls:
 
   for story_url in story_urls:
     soup = get_soup(story_url)
-    pages_caption = soup.find('span', class_='b-pager-caption-t').text
-    num_pages = pages_caption.split()[0]
+
+    try:
+      pages_caption = soup.find('span', class_='b-pager-caption-t').text
+      num_pages = pages_caption.split()[0]
+    except:
+      num_pages = '1'
 
     author = soup.find('span', class_='b-story-user-y').find('a').text.strip()
 
-    stats = soup.find('span', class_='b-story-stats').text
-    num_comments, num_views, num_favorites = [n for i, n in enumerate(stats.split()) if i % 2 == 0]
+    try:
+      stats = soup.find('span', class_='b-story-stats').text
+      num_comments, num_views, num_favorites = [n for i, n in enumerate(stats.split()) if i % 2 == 0]
+    except:
+      num_comments, num_views, num_favorites = 'None', 'None', 'None'
 
     data = '\t'.join([story_url, num_pages, category, author, num_comments, num_views, num_favorites])
     print('\t', data)
