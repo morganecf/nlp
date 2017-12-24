@@ -14,7 +14,7 @@ python download_literotica_data.py --urls urls.tsv --data_dir data/literotica/ -
 ```  
 
 ### Exploration
-EDA done in [this notebook]().
+EDA done in [this notebook](). Some highlighted findings:  
 
 ### Intensity shapes
 
