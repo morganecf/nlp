@@ -73,8 +73,11 @@ for category, category_url in list(zip(categories, category_urls))[start_index:]
     except:
       num_comments, num_views, num_favorites = 'None', 'None', 'None'
 
-    data = '\t'.join([story_url, num_pages, category, author, num_comments, num_views, num_favorites])
-    print('\t', data)
-    fp.write(data + '\n')
+    try:
+      data = '\t'.join([story_url, num_pages, category, author, num_comments, num_views, num_favorites])
+      print('\t', data)
+      fp.write(data + '\n')
+    except:
+      pass
 
 fp.close()
