@@ -2,7 +2,7 @@
 
 ## Story analysis
 
-### Downloading data
+### Data
 To download data from [Literotica](https://www.literotica.com) use these commands:  
 
 ```
@@ -12,11 +12,12 @@ python get_literotica_urls.py --urls urls.tsv
 # Downloads stories or subset of stories
 python download_literotica_data.py --urls urls.tsv --data_dir data/literotica/ --sample 0.2
 ```  
+A snapshot of the urls as of 12-24-2017 is available at `data/literotica_urls.tsv`, so skip the first command if you want to use those.  
 
 ### Exploration
 Basic EDA on category-level stats done in [this notebook](https://github.com/morganecf/nlp/blob/master/notebooks/Literotica%20EDA.ipynb). Some highlighted findings:  
 
-[D3 network visualization](https://github.com/morganecf/nlp/blob/master/notebooks/Literotica%20Category%20Network.ipynb) linking categories based on author activity:  
+[Interactive D3 network visualization](https://github.com/morganecf/nlp/blob/master/notebooks/Literotica%20Category%20Network.ipynb) linking categories based on author activity:  
 
 <img src="https://user-images.githubusercontent.com/4405597/34368502-8ad7ae48-ea82-11e7-8fac-ee9056a7a285.png" width=400 height=300>
 
