@@ -5,8 +5,7 @@
 This repository collects the text and metadata from several online story or fanfiction sources and uses NLP and machine learning techniques to analyze the data and build generative models from the data. The data sources are:  
 
 * Cyberpunk fanfic stories from [Archive Of Your Own](https://archiveofourown.org/tags/Cyberpunk)
-* Erotic fiction from [Literotica.com](https://www.literotica.com)
-* 
+* Erotic fiction from [Literotica.com](https://www.literotica.com). See [here](https://github.com/morganecf/nlp/blob/master/literotica.md) for an overview of observations gleaned from the dataset
 
 This README will go over some of the cyberpunk analyses. 
 
