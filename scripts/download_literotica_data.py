@@ -16,24 +16,30 @@ from bs4 import BeautifulSoup
 parser = argparse.ArgumentParser()
 parser.add_argument('--urls', required=True, type=str, help='urls to scrape, generated from download_literotica_data.py')
 parser.add_argument('--data_dir', required=True, type=str, help='directory in which to save output jsons')
-parser.add_argument('--sample', type=float, min=0, max=1, default=1, help='fraction of stories to sample per category (1 to get all stories)')
+parser.add_argument('--sample', type=float, default=1, help='fraction of stories to sample per category (1 to get all stories)')
 
 args = parser.parse_args()
 
-urls = pd.read_csv(args.urls, delim_whitespace=True)
+urls = pd.read_csv(args.urls, sep='\t')
 urls = urls.drop_duplicates('story_url')
 
 by_category = urls.groupby('category')
 
 for category, group in by_category:
   sample = group.sample(frac=args.sample)
+  num_stories = len(sample.story_url)
 
-  out = open(os.join(args.data_dir, category, '.txt'), 'w')
+  print('Category:', category)
 
-  for index, row in urls.iterrows():
+  out = open(os.path.join(args.data_dir, category + '.txt'), 'w')
+
+  i = 1
+  for index, row in sample.iterrows():
     url = row['story_url']
-    num_pages = row['num_pages']
-    pages = [url + '?page=' + i for i in range(2, num_pages + 1)]
+    num_pages = int(row['num_pages'])
+    pages = [url + '?page=' + str(i) for i in range(2, num_pages + 1)]
+
+    print('\t', url, num_pages, 'pages\t', i, '/', num_stories)
 
     story = ''
     for page in pages:
@@ -44,6 +50,8 @@ for category, group in by_category:
 
     row_json = { key: row[key] for key in row.keys() }
     row_json['text'] = story
+
+    i += 1
 
     out.write(json.dumps(row_json) + '\n')
 
