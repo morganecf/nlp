@@ -10,6 +10,7 @@ To download data (will scrape urls first if urls.tsv is empty):
 
 import os
 import json
+import string
 import argparse
 import requests
 from bs4 import BeautifulSoup
@@ -18,23 +19,37 @@ BASE_URL = 'https://archiveofourown.org/works/'
 BASE_CYBERPUNK_URL = 'https://archiveofourown.org/tags/Cyberpunk/works'
 
 '''
-might need to do something about CW (need to hit button)
-
-rating, archive warning, category, fandoms, characters, additional tags, language, stats
-  stats: publish date, updated, words, chapters, comments, kudos, bookmarks, hits
+NOTE: might need to do something about CW (need to hit button)
 '''
 
+def format_title(title):
+  for p in string.punctuation:
+    title = title.replace(p, '')
+  return '-'.join(title.lower().split()) + '.json'
+
+def to_str(el):
+  s = el.text.strip()
+  if type(s) is bytes:
+    return s.decode('utf-8')
+  return s
+
 def get_tags(soup, tag):
-  return [li.text.strip() for li in soup.find('dd', class_=tag).find_all('li')]
+  tags = soup.find('dd', class_=tag)
+  if tags:
+    return [to_str(li) for li in tags.find_all('li')]
+  return []
 
 def get_stat(soup, stat):
   try:
-    return soup.find('dd', class_=stat).text.strip()
+    return to_str(soup.find('dd', class_=stat))
   except:
     return None
 
 def get_attr(soup, el, class_):
-  return soup.find(el, class_=class_).text.strip()
+  try:
+    return to_str(soup.find(el, class_=class_))
+  except:
+    return None
 
 def get_story_data(url):
   response = requests.get(url)
@@ -59,27 +74,20 @@ def get_story_data(url):
     'notes': get_attr(soup, 'div', 'notes')
   }
 
-  story_container = soup.find('div', id='#chapters')
-  paragraphs = [p.text.strip() for p in story_container.find_all('p')]
+  story_container = soup.find('div', id='chapters')
+  paragraphs = [to_str(p) for p in story_container.find_all('p')]
 
   data['paragraphs'] = paragraphs
 
-  print('Story:', data['title'], '\t', data['published'], '\t', data['author'])
-  print('\t', data['ratings'], data['warnings'], data['fandoms'])
-  print('\t', data['relationships'], data['characters'])
-  print('\t#Words, #Chapters, #Kudos, #Hits', data['words'], data['chapters'], data['kudos'], data['hits'])
-
   return data
 
-
 def download_stories(urls, data_dir):
-  for url in urls:
+  for i, url in enumerate(urls):
+    print('url:', url, '\t', i, '/', len(urls))
     story_data = get_story_data(url)
-    title = '-'.join(story_data['title'].lower().split())
-    path = os.path.join(data_dir, path, '.json')
-    print('Saving:', path)
-    print('====================================================')
-    json.dump(open(path, 'w'), story_data)
+    title = format_title(story_data['title'])
+    path = os.path.join(data_dir, title)
+    json.dump(dict(story_data), open(path, 'w'), indent=4)
 
 def save_urls(urls_file, num_pages, data_dir=None):
   for i in range(1, num_pages + 1):
