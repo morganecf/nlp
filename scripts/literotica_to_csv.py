@@ -41,6 +41,6 @@ for file in files:
     data['title'].extend([title] * len(sentences))
 
 
-print('saving', len(data), 'sentences')
+print('saving', len(data['text']), 'sentences')
 df = pd.DataFrame(data)
 df.to_csv(output_file)
