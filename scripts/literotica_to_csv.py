@@ -11,26 +11,36 @@ from nltk.tokenize import sent_tokenize
 
 try:
   input_data_dir = sys.argv[1]
-  output_data_dir = sys.argv[2]
+  output_file = sys.argv[2]
 except IndexError:
-  print('Input and output data directories are required and cannot be the same')
+  print('Input directory and output file are required')
   sys.exit(1)
 
 files = [f for f in os.listdir(input_data_dir) if f.endswith('.txt')]
 
-paragraphs = []
+data = {
+  'text': [],
+  'category': [],
+  'title': []
+}
 
 for file in files:
   stories = open(os.path.join(input_data_dir, file)).read().splitlines()
-  out_path = os.path.join(output_data_dir, file.replace('.txt', '-sentences.csv'))
 
-  data = []
+  category  = file.replace('.txt', '')
+
+  print('Category:', category)
+
   for story in stories:
     story = json.loads(story)
     text = story['text']
+    title = story['story_url'].split('/')[-1]
     sentences = sent_tokenize(text)
-    data.extend(sentences)
+    data['text'].extend(sentences)
+    data['category'].extend([category] * len(sentences))
+    data['title'].extend([title] * len(sentences))
 
-  print('\tSaving', len(data), 'sentences from category', file)
-  df = pd.DataFrame({'text': data})
-  df.to_csv(out_path)
+
+print('saving', len(data), 'sentences')
+df = pd.DataFrame(data)
+df.to_csv(output_file)

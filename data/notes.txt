@@ -2,3 +2,4 @@ NOTES:
 - *-0.1 indicates that 1% of the data was scraped in each category
   - json-0.1/ contains files for each category. each file contains json story objects, with the text of the story and metadata
   - sentences-0.1/ contains files for each category with only the sentences from the stories (tokenized using nltk)
+- use merge_all_literotica_sentences.sh to combine all the sentences into one file
